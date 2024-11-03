@@ -1,6 +1,6 @@
 import "../global.css";
 import { Stack } from "expo-router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -14,15 +14,16 @@ export default function Layout() {
     "DMSans-Regular": require("../assets/fonts/DMSans-Regular.ttf"),
   });
 
-  useEffect(() => {
-    const hideSplashScreen = async () => {
-      if (fontsLoaded) {
-        await SplashScreen.hideAsync();
-      }
-    };
-
-    hideSplashScreen();
+  // Define the hideSplashScreen callback outside of useEffect
+  const hideSplashScreen = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
   }, [fontsLoaded]);
+
+  useEffect(() => {
+    hideSplashScreen();
+  }, [hideSplashScreen]);
 
   if (!fontsLoaded) {
     return null; // Optionally, render a loading indicator

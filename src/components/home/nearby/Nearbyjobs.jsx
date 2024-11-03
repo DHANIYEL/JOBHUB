@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -8,24 +8,18 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SIZES, COLORS } from "../../../constants";
-import PopularJobCard from "../../common/cards/popular/PopularJobCard";
+import NearbyJobCard from "../../common/cards/nearby/NearbyJobCard";
+import useFetch from "../../../hook/useFetch";
 
 import styles from "./nearbyjobs.style";
 
 const Nearbyjobs = () => {
-  const [loading, setLoading] = useState(true); // Add loading state
-
-  useEffect(() => {
-    // Simulate data fetching
-    const fetchData = async () => {
-      setLoading(true); // Start loading
-      // Simulating a network request
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Replace with real data fetching logic
-      setLoading(false); // Stop loading after data is fetched
-    };
-
-    fetchData();
-  }, []);
+  const router = useRouter();
+  const { data, isLoading, error } = useFetch("search", {
+    query: "React Native developer",
+    num_pages: "1",
+  });
+  console.log(data);
 
   return (
     <View style={styles.container}>
@@ -37,21 +31,20 @@ const Nearbyjobs = () => {
       </View>
 
       <View style={styles.cardsContainer}>
-        {loading ? (
-          // Show loading indicator when loading is true
+        {isLoading ? (
           <ActivityIndicator size="large" color={COLORS.tertiary} />
+        ) : error ? (
+          <Text>Something Went Wrong. Please try again later.</Text>
+        ) : data && data.length > 0 ? (
+          data?.map((job) => (
+            <NearbyJobCard
+              job={job}
+              key={`nearby-job-${job.job_id}`}
+              handleNavigate={() => router.push(`/job-details/${job.job_id}`)}
+            />
+          ))
         ) : (
-          // Render job cards or other content here when loading is false
-
-          <FlatList
-            data={[1, 2, 3, 4, 5, 6, 7]}
-            renderItem={({ item }) => {
-              return <PopularJobCard item={item} />;
-            }}
-            keyExtractor={(item) => item?.job_id}
-            contentContainerStyle={{ columnGap: SIZES.medium }}
-            horizontal
-          />
+          <Text>No jobs found for your criteria.</Text>
         )}
       </View>
     </View>
