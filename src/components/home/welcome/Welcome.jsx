@@ -14,7 +14,7 @@ import { router } from "expo-router";
 
 const Welcome = () => {
   const [activeJobType, setActiveJobType] = useState("Full-time");
-  const jobTypes = ["Full-time", "Part-time", "Contract"];
+  const jobTypes = ["Full-time", "Part-time", "Contract", "Contract"];
   return (
     <View>
       <View style={styles.container}>
